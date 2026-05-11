@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html class="light" lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Julian's Blog</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css">
+<script id="tailwind-config">
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                "surface-bright": "#f9f9fc",
+                "on-surface": "#2d3748",
+                "on-surface-variant": "#4a5568",
+                "outline-variant": "#e2e8f0",
+                "primary": "#4a5568",
+                "on-primary": "#ffffff",
+                "surface-variant": "#edf2f7",
+            },
+            borderRadius: {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "2xl": "1rem",
+                "full": "9999px"
+            },
+            fontFamily: {
+                "heading": ["Inter", "Noto Sans SC", "sans-serif"],
+                "body": ["Inter", "Noto Sans SC", "sans-serif"],
+            }
+        }
+    }
+}
+</script>
+</head>
+<body class="text-on-surface antialiased min-h-screen relative overflow-x-hidden font-body bg-cover bg-center bg-fixed" style="background-image: url('logo.jpg');">
+
+<!-- Top Navigation Bar -->
+<nav class="glass-nav w-full h-16 sticky top-0 z-50 flex items-center justify-between px-4 md:px-8">
+    <div class="flex items-center gap-8 max-w-[1400px] w-full mx-auto">
+        <div class="flex items-center gap-8">
+            <a class="flex items-center gap-3" href="#" onclick="showSection('home')">
+                <img alt="Logo" class="w-8 h-8 rounded-full object-cover shadow-sm" src="logo.jpg" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=Julian'"/>
+                <span class="font-heading text-[18px] font-bold text-on-surface tracking-wide">Julian's Blog</span>
+            </a>
+            <div class="hidden md:flex gap-6">
+                <a class="nav-link text-on-surface font-body text-[15px]" href="#" data-section="home" onclick="showSection('home')">首页</a>
+                <a class="nav-link text-on-surface-variant hover:text-on-surface transition-colors font-body text-[15px]" href="#" data-section="archive" onclick="showSection('archive')">归档</a>
+                <a class="nav-link text-on-surface-variant hover:text-on-surface transition-colors font-body text-[15px]" href="#" data-section="tags" onclick="showSection('tags')">标签</a>
+                <a class="nav-link text-on-surface-variant hover:text-on-surface transition-colors font-body text-[15px]" href="#" data-section="projects" onclick="showSection('projects')">项目</a>
+                <a class="nav-link text-on-surface-variant hover:text-on-surface transition-colors font-body text-[15px]" href="#" data-section="about" onclick="showSection('about')">关于</a>
+                <a class="nav-link text-on-surface-variant hover:text-on-surface transition-colors font-body text-[15px]" href="#" data-section="friends" onclick="showSection('friends')">友链</a>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 text-on-surface-variant ml-auto">
+            <a class="hover:text-on-surface transition-colors" href="#" title="RSS"><span class="material-symbols-outlined text-[20px]">rss_feed</span></a>
+            <button class="hover:text-on-surface transition-colors" onclick="toggleSearch()"><span class="material-symbols-outlined text-[20px]">search</span></button>
+            <button class="hover:text-on-surface transition-colors" title="Toggle Dark Mode"><span class="material-symbols-outlined text-[20px]">dark_mode</span></button>
+        </div>
+    </div>
+</nav>
+
+<!-- ========== HOME SECTION ========== -->
+<section id="section-home" class="section-content p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Column: Profile & Categories -->
+        <aside class="lg:col-span-3 flex flex-col gap-6">
+            <!-- Profile Card -->
+            <div class="glass-card rounded-2xl p-6 flex flex-col items-center text-center">
+                <img alt="Profile" class="w-24 h-24 rounded-full object-cover shadow-sm mb-4" src="logo.jpg" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=Julian'"/>
+                <h2 class="font-heading text-[22px] font-bold text-on-surface mb-2">Julian</h2>
+                <p class="text-on-surface-variant font-body text-[14px] mb-6">童话只美在真实却从不续写</p>
+                <div class="flex justify-between w-full px-2 pt-4 border-t border-black/5">
+                    <div class="flex flex-col items-center">
+                        <span class="font-heading text-[18px] font-semibold text-on-surface">101</span>
+                        <span class="text-on-surface-variant text-[12px]">文章</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="font-heading text-[18px] font-semibold text-on-surface">6</span>
+                        <span class="text-on-surface-variant text-[12px]">分类</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="font-heading text-[18px] font-semibold text-on-surface">186</span>
+                        <span class="text-on-surface-variant text-[12px]">标签</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="font-heading text-[18px] font-semibold text-on-surface">31.7</span>
+                        <span class="text-on-surface-variant text-[12px]">万字</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories Card -->
+            <div class="glass-card rounded-2xl p-6">
+                <h3 class="text-on-surface text-[15px] font-bold mb-4">分类</h3>
+                <ul class="flex flex-col gap-3">
+                    <li class="flex justify-between items-center group cursor-pointer">
+                        <span class="text-on-surface-variant group-hover:text-on-surface transition-colors font-body text-[14px]">技术向</span>
+                        <span class="bg-black/5 text-on-surface-variant text-[12px] px-2 py-0.5 rounded">36</span>
+                    </li>
+                    <li class="flex justify-between items-center group cursor-pointer">
+                        <span class="text-on-surface-variant group-hover:text-on-surface transition-colors font-body text-[14px]">笔记本</span>
+                        <span class="bg-black/5 text-on-surface-variant text-[12px] px-2 py-0.5 rounded">33</span>
+                    </li>
+                    <li class="flex justify-between items-center group cursor-pointer">
+                        <span class="text-on-surface-variant group-hover:text-on-surface transition-colors font-body text-[14px]">创作集</span>
+                        <span class="bg-black/5 text-on-surface-variant text-[12px] px-2 py-0.5 rounded">8</span>
+                    </li>
+                    <li class="flex justify-between items-center group cursor-pointer">
+                        <span class="text-on-surface-variant group-hover:text-on-surface transition-colors font-body text-[14px]">自言语</span>
+                        <span class="bg-black/5 text-on-surface-variant text-[12px] px-2 py-0.5 rounded">8</span>
+                    </li>
+                    <li class="flex justify-between items-center group cursor-pointer">
+                        <span class="text-on-surface-variant group-hover:text-on-surface transition-colors font-body text-[14px]">分享境</span>
+                        <span class="bg-black/5 text-on-surface-variant text-[12px] px-2 py-0.5 rounded">6</span>
+                    </li>
+                    <li class="flex justify-between items-center group cursor-pointer">
+                        <span class="text-on-surface-variant group-hover:text-on-surface transition-colors font-body text-[14px]">黑苹果</span>
+                        <span class="bg-black/5 text-on-surface-variant text-[12px] px-2 py-0.5 rounded">9</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Hot Tags Card -->
+            <div class="glass-card rounded-2xl p-6">
+                <h3 class="text-on-surface text-[15px] font-bold mb-4">热门标签</h3>
+                <div class="flex flex-wrap gap-2">
+                    <span class="bg-black/5 hover:bg-black/10 text-on-surface-variant text-[13px] px-3 py-1 rounded-full cursor-pointer transition-colors">代理协议</span>
+                    <span class="bg-black/5 hover:bg-black/10 text-on-surface-variant text-[13px] px-3 py-1 rounded-full cursor-pointer transition-colors">设计系统</span>
+                    <span class="bg-black/5 hover:bg-black/10 text-on-surface-variant text-[13px] px-3 py-1 rounded-full cursor-pointer transition-colors">密码管理</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center Column: Main Content -->
+        <div class="lg:col-span-6 flex flex-col gap-6">
+            <!-- Article Card 1 -->
+            <article class="glass-card rounded-2xl p-6 md:p-8 cursor-pointer group hover:-translate-y-1 transition-transform duration-300">
+                <h3 class="font-heading text-[20px] font-bold text-on-surface mb-3 group-hover:text-blue-600 transition-colors leading-snug">
+                    杀死那只鹦鹉 —— 「白话文」讲解一种探测 XTLS VLESS REALITY 的手段
+                </h3>
+                <p class="font-body text-[15px] text-on-surface-variant mb-6 line-clamp-3 leading-relaxed">
+                    让我们抛弃传统的「猫鼠游戏」对抗思维，不去费力寻找 VLESS 和 REALITY 协议在密码学上可能存在的深奥缺陷，而去关注一个更具决定性且无法逾越的变量：@RPRX ...
+                </p>
+                <div class="flex items-center justify-between mt-auto">
+                    <span class="text-on-surface-variant text-[13px]">2026-02-16 · 技术向</span>
+                    <span class="text-on-surface-variant text-[13px] group-hover:text-blue-600 transition-colors">继续阅读</span>
+                </div>
+            </article>
+
+            <!-- Article Card 2 -->
+            <article class="glass-card rounded-2xl p-6 md:p-8 cursor-pointer group hover:-translate-y-1 transition-transform duration-300">
+                <h3 class="font-heading text-[20px] font-bold text-on-surface mb-3 group-hover:text-blue-600 transition-colors leading-snug">
+                    超越矩形画布 (Beyond the Rectangular Canvas)
+                </h3>
+                <p class="font-body text-[15px] text-on-surface-variant mb-6 line-clamp-3 leading-relaxed">
+                    深入探讨空间计算界面，以及我们必须如何发展我们的设计语言以适应 z 轴交互。
+                </p>
+                <div class="flex items-center justify-between mt-auto">
+                    <span class="text-on-surface-variant text-[13px]">2023-09-15 · 笔记本</span>
+                    <span class="text-on-surface-variant text-[13px] group-hover:text-blue-600 transition-colors">继续阅读</span>
+                </div>
+            </article>
+        </div>
+
+        <!-- Right Column: Recent & Archive -->
+        <aside class="lg:col-span-3 flex flex-col gap-6">
+            <!-- Recent Posts -->
+            <div class="glass-card rounded-2xl p-6">
+                <h3 class="text-on-surface text-[15px] font-bold mb-4">最近文章</h3>
+                <div class="flex flex-col gap-5">
+                    <a class="group block" href="#">
+                        <div class="text-[12px] text-on-surface-variant mb-1">2026-02-16</div>
+                        <div class="font-body text-[14px] text-on-surface group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight">杀死那只鹦鹉 —— 「白话文」讲解一种探测 XTLS VLESS...</div>
+                    </a>
+                    <a class="group block" href="#">
+                        <div class="text-[12px] text-on-surface-variant mb-1">2026-01-10</div>
+                        <div class="font-body text-[14px] text-on-surface group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight">为 Microsoft 365 添加 1Password 等 Synced Passkey</div>
+                    </a>
+                    <a class="group block" href="#">
+                        <div class="text-[12px] text-on-surface-variant mb-1">2025-11-30</div>
+                        <div class="font-body text-[14px] text-on-surface group-hover:text-blue-600 transition-colors line-clamp-3 leading-tight">用代码和 Git 管理 DNS 记录 —— DNSControl 和 GitHub Actions CI/CD 实践</div>
+                    </a>
+                    <a class="group block" href="#">
+                        <div class="text-[12px] text-on-surface-variant mb-1">2025-10-16</div>
+                        <div class="font-body text-[14px] text-on-surface group-hover:text-blue-600 transition-colors line-clamp-3 leading-tight">是什么，为什么，怎么做 —— 谈谈 DNS 泄漏、CDN 访问优化与 Fake IP</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Archive -->
+            <div class="glass-card rounded-2xl p-6">
+                <h3 class="text-on-surface text-[15px] font-bold mb-4">归档</h3>
+                <ul class="flex flex-col gap-3">
+                    <li class="flex justify-between items-center group cursor-pointer">
+                        <span class="text-on-surface-variant group-hover:text-on-surface transition-colors font-body text-[14px]">2026</span>
+                        <span class="text-on-surface-variant text-[13px]">2</span>
+                    </li>
+                    <li class="flex justify-between items-center group cursor-pointer">
+                        <span class="text-on-surface-variant group-hover:text-on-surface transition-colors font-body text-[14px]">2025</span>
+                        <span class="text-on-surface-variant text-[13px]">4</span>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+    </div>
+</section>
+
+<!-- ========== PROJECTS SECTION ========== -->
+<section id="section-projects" class="section-content p-4 md:p-8 max-w-[1200px] mx-auto w-full hidden">
+    <header class="mb-12">
+        <h2 class="font-heading text-[32px] font-bold text-on-surface mb-3">项目</h2>
+        <p class="font-body text-[16px] text-on-surface-variant max-w-2xl">我参与和开发的一些开源项目与技术实践。</p>
+    </header>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 cursor-pointer group">
+            <div class="text-4xl mb-4">&#x1F310;</div>
+            <h3 class="font-heading text-[18px] font-bold text-on-surface mb-3 group-hover:text-blue-600 transition-colors">静态博客生成器</h3>
+            <p class="font-body text-[14px] text-on-surface-variant">基于 Markdown 的轻量级静态博客生成工具，支持自定义主题和自动部署。</p>
+            <div class="flex flex-wrap gap-2 mt-4">
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">Go</span>
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">Markdown</span>
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">GitHub Actions</span>
+            </div>
+        </div>
+        <div class="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 cursor-pointer group">
+            <div class="text-4xl mb-4">&#x1F4CA;</div>
+            <h3 class="font-heading text-[18px] font-bold text-on-surface mb-3 group-hover:text-blue-600 transition-colors">数据可视化面板</h3>
+            <p class="font-body text-[14px] text-on-surface-variant">基于 D3.js 的实时数据监控仪表板，支持多种图表类型和自定义指标。</p>
+            <div class="flex flex-wrap gap-2 mt-4">
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">D3.js</span>
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">TypeScript</span>
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">WebSocket</span>
+            </div>
+        </div>
+        <div class="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 cursor-pointer group">
+            <div class="text-4xl mb-4">&#x1F4DD;</div>
+            <h3 class="font-heading text-[18px] font-bold text-on-surface mb-3 group-hover:text-blue-600 transition-colors">DNS 配置管理工具</h3>
+            <p class="font-body text-[14px] text-on-surface-variant">用代码和 Git 管理 DNS 记录，基于 DNSControl 和 GitHub Actions CI/CD。</p>
+            <div class="flex flex-wrap gap-2 mt-4">
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">DNSControl</span>
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">CI/CD</span>
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">JavaScript</span>
+            </div>
+        </div>
+        <div class="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 cursor-pointer group">
+            <div class="text-4xl mb-4">&#x1F527;</div>
+            <h3 class="font-heading text-[18px] font-bold text-on-surface mb-3 group-hover:text-blue-600 transition-colors">自动化部署脚本集</h3>
+            <p class="font-body text-[14px] text-on-surface-variant">一套用于服务器自动化部署的 Shell 脚本集，涵盖 Nginx、Docker、SSL 证书管理。</p>
+            <div class="flex flex-wrap gap-2 mt-4">
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">Shell</span>
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">Docker</span>
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">Nginx</span>
+            </div>
+        </div>
+        <div class="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 cursor-pointer group">
+            <div class="text-4xl mb-4">&#x1F4F1;</div>
+            <h3 class="font-heading text-[18px] font-bold text-on-surface mb-3 group-hover:text-blue-600 transition-colors">响应式 UI 组件库</h3>
+            <p class="font-body text-[14px] text-on-surface-variant">一组轻量级、可自定义的 Web UI 组件，专为个人项目和小型团队设计。</p>
+            <div class="flex flex-wrap gap-2 mt-4">
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">React</span>
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">Tailwind</span>
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">Storybook</span>
+            </div>
+        </div>
+        <div class="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 cursor-pointer group">
+            <div class="text-4xl mb-4">&#x1F4AC;</div>
+            <h3 class="font-heading text-[18px] font-bold text-on-surface mb-3 group-hover:text-blue-600 transition-colors">评论系统集成方案</h3>
+            <p class="font-body text-[14px] text-on-surface-variant">为静态博客集成轻量级评论系统的开源方案，支持多种后端选择。</p>
+            <div class="flex flex-wrap gap-2 mt-4">
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">Giscus</span>
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">Waline</span>
+                <span class="text-[12px] px-2 py-1 bg-black/5 rounded text-on-surface-variant">API</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== ABOUT SECTION ========== -->
+<section id="section-about" class="section-content p-4 md:p-8 max-w-[900px] mx-auto w-full hidden">
+    <header class="mb-12 relative rounded-2xl overflow-hidden group h-[300px] md:h-[400px]">
+        <div class="absolute inset-0 bg-gradient-to-br from-pink-200 to-pink-300 opacity-60"></div>
+        <div class="absolute inset-0 bg-white/40 backdrop-blur-[2px]"></div>
+        <div class="absolute bottom-0 left-0 p-8 w-full backdrop-blur-md bg-white/50 border-t border-white/40">
+            <h2 class="font-heading text-[32px] font-bold text-on-surface mb-2">Julian</h2>
+            <p class="font-body text-[16px] text-on-surface-variant max-w-2xl">热爱技术，喜欢探索，记录成长的点滴。</p>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-8 space-y-6">
+            <article class="glass-card rounded-2xl p-8">
+                <h3 class="font-heading text-[24px] font-bold text-on-surface mb-6 flex items-center gap-3">
+                    <span class="material-symbols-outlined text-[28px]">psychology</span>
+                    理念与态度
+                </h3>
+                <div class="space-y-4 text-[15px] text-on-surface-variant leading-relaxed">
+                    <p>我相信技术应该服务于生活，而非主导生活。好的工具让人更专注于创造，而不是消耗在工具的配置和维护上。</p>
+                    <p>在这个信息爆炸的时代，我追求高质量的输出而非高频的更新。每一篇文章都是经过思考和实践后的沉淀，希望能为读者带来真正的价值。</p>
+                    <p>这个博客是我个人的数字花园，记录着我在技术道路上的探索、思考和收获。欢迎你常来看看。</p>
+                </div>
+            </article>
+        </div>
+        <div class="lg:col-span-4">
+            <div class="glass-card rounded-2xl p-6 sticky top-[88px]">
+                <h4 class="font-heading text-[18px] font-bold text-on-surface mb-4 flex items-center gap-2 border-b border-black/5 pb-3">
+                    <span class="material-symbols-outlined text-[20px]">architecture</span>
+                    技术栈
+                </h4>
+                <div class="space-y-5">
+                    <div>
+                        <h5 class="text-on-surface-variant text-[12px] mb-2 uppercase tracking-wider font-heading">前端</h5>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-black/5 text-on-surface-variant text-[13px] px-3 py-1 rounded-full">HTML/CSS</span>
+                            <span class="bg-black/5 text-on-surface-variant text-[13px] px-3 py-1 rounded-full">Tailwind CSS</span>
+                            <span class="bg-black/5 text-on-surface-variant text-[13px] px-3 py-1 rounded-full">JavaScript</span>
+                            <span class="bg-black/5 text-on-surface-variant text-[13px] px-3 py-1 rounded-full">React</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="text-on-surface-variant text-[12px] mb-2 uppercase tracking-wider font-heading">后端 & 运维</h5>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-black/5 text-on-surface-variant text-[13px] px-3 py-1 rounded-full">Go</span>
+                            <span class="bg-black/5 text-on-surface-variant text-[13px] px-3 py-1 rounded-full">Node.js</span>
+                            <span class="bg-black/5 text-on-surface-variant text-[13px] px-3 py-1 rounded-full">Docker</span>
+                            <span class="bg-black/5 text-on-surface-variant text-[13px] px-3 py-1 rounded-full">Nginx</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="text-on-surface-variant text-[12px] mb-2 uppercase tracking-wider font-heading">兴趣领域</h5>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-black/5 text-on-surface-variant text-[13px] px-3 py-1 rounded-full">网络协议</span>
+                            <span class="bg-black/5 text-on-surface-variant text-[13px] px-3 py-1 rounded-full">隐私安全</span>
+                            <span class="bg-black/5 text-on-surface-variant text-[13px] px-3 py-1 rounded-full">开源</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== ARCHIVE SECTION ========== -->
+<section id="section-archive" class="section-content p-4 md:p-8 max-w-[1200px] mx-auto w-full hidden">
+    <header class="max-w-3xl mb-8">
+        <h2 class="font-heading text-[32px] font-bold text-on-surface mb-3">归档</h2>
+        <p class="font-body text-[16px] text-on-surface-variant">记录过去的时光与思考。</p>
+    </header>
+    <div class="glass-card rounded-2xl p-8">
+        <div class="relative border-l border-black/10 pl-6 space-y-10">
+            <!-- 2026 -->
+            <div class="relative">
+                <span class="absolute -left-[31px] top-1 w-3 h-3 rounded-full bg-blue-500 ring-4 ring-white/50"></span>
+                <h3 class="font-heading text-[24px] font-bold text-on-surface mb-4">2026</h3>
+                <div class="space-y-4">
+                    <a class="group flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-black/5 pb-4 last:border-0 last:pb-0" href="#">
+                        <span class="text-[14px] text-on-surface-variant w-24 shrink-0">02-16</span>
+                        <span class="font-body text-[16px] text-on-surface group-hover:text-blue-600 transition-colors">杀死那只鹦鹉 —— 「白话文」讲解一种探测 XTLS VLESS REALITY 的手段</span>
+                    </a>
+                    <a class="group flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-black/5 pb-4 last:border-0 last:pb-0" href="#">
+                        <span class="text-[14px] text-on-surface-variant w-24 shrink-0">01-10</span>
+                        <span class="font-body text-[16px] text-on-surface group-hover:text-blue-600 transition-colors">为 Microsoft 365 添加 1Password 等 Synced Passkey</span>
+                    </a>
+                </div>
+            </div>
+            <!-- 2025 -->
+            <div class="relative">
+                <span class="absolute -left-[31px] top-1 w-3 h-3 rounded-full bg-blue-400 ring-4 ring-white/50"></span>
+                <h3 class="font-heading text-[24px] font-bold text-on-surface mb-4">2025</h3>
+                <div class="space-y-4">
+                    <a class="group flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-black/5 pb-4 last:border-0 last:pb-0" href="#">
+                        <span class="text-[14px] text-on-surface-variant w-24 shrink-0">11-30</span>
+                        <span class="font-body text-[16px] text-on-surface group-hover:text-blue-600 transition-colors">用代码和 Git 管理 DNS 记录 —— DNSControl 和 GitHub Actions CI/CD 实践</span>
+                    </a>
+                    <a class="group flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-black/5 pb-4 last:border-0 last:pb-0" href="#">
+                        <span class="text-[14px] text-on-surface-variant w-24 shrink-0">10-16</span>
+                        <span class="font-body text-[16px] text-on-surface group-hover:text-blue-600 transition-colors">是什么，为什么，怎么做 —— 谈谈 DNS 泄漏、CDN 访问优化与 Fake IP</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== TAGS SECTION ========== -->
+<section id="section-tags" class="section-content p-4 md:p-8 max-w-[1200px] mx-auto w-full hidden">
+    <header class="max-w-3xl mb-8">
+        <h2 class="font-heading text-[32px] font-bold text-on-surface mb-3">标签</h2>
+        <p class="font-body text-[16px] text-on-surface-variant">所有文章的话题分类。</p>
+    </header>
+    <div class="glass-card rounded-2xl p-8">
+        <div class="flex flex-wrap gap-4">
+            <span class="bg-black/5 hover:bg-black/10 text-on-surface-variant text-[15px] px-4 py-2 rounded-full cursor-pointer transition-colors flex items-center gap-2">代理协议 <span class="bg-white/50 text-[12px] px-2 rounded-full">12</span></span>
+            <span class="bg-black/5 hover:bg-black/10 text-on-surface-variant text-[15px] px-4 py-2 rounded-full cursor-pointer transition-colors flex items-center gap-2">设计系统 <span class="bg-white/50 text-[12px] px-2 rounded-full">8</span></span>
+            <span class="bg-black/5 hover:bg-black/10 text-on-surface-variant text-[15px] px-4 py-2 rounded-full cursor-pointer transition-colors flex items-center gap-2">密码管理 <span class="bg-white/50 text-[12px] px-2 rounded-full">5</span></span>
+            <span class="bg-black/5 hover:bg-black/10 text-on-surface-variant text-[15px] px-4 py-2 rounded-full cursor-pointer transition-colors flex items-center gap-2">DNS <span class="bg-white/50 text-[12px] px-2 rounded-full">15</span></span>
+            <span class="bg-black/5 hover:bg-black/10 text-on-surface-variant text-[15px] px-4 py-2 rounded-full cursor-pointer transition-colors flex items-center gap-2">CDN <span class="bg-white/50 text-[12px] px-2 rounded-full">9</span></span>
+            <span class="bg-black/5 hover:bg-black/10 text-on-surface-variant text-[15px] px-4 py-2 rounded-full cursor-pointer transition-colors flex items-center gap-2">CI/CD <span class="bg-white/50 text-[12px] px-2 rounded-full">7</span></span>
+            <span class="bg-black/5 hover:bg-black/10 text-on-surface-variant text-[15px] px-4 py-2 rounded-full cursor-pointer transition-colors flex items-center gap-2">Git <span class="bg-white/50 text-[12px] px-2 rounded-full">11</span></span>
+            <span class="bg-black/5 hover:bg-black/10 text-on-surface-variant text-[15px] px-4 py-2 rounded-full cursor-pointer transition-colors flex items-center gap-2">前端 <span class="bg-white/50 text-[12px] px-2 rounded-full">24</span></span>
+        </div>
+    </div>
+</section>
+
+<!-- ========== FRIENDS SECTION ========== -->
+<section id="section-friends" class="section-content p-4 md:p-8 max-w-[1200px] mx-auto w-full hidden">
+    <header class="max-w-3xl mb-8">
+        <h2 class="font-heading text-[32px] font-bold text-on-surface mb-3">友链</h2>
+        <p class="font-body text-[16px] text-on-surface-variant">一群有趣的灵魂和值得关注的技术博客。</p>
+    </header>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <a class="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-all duration-300 group flex items-start gap-4" href="#">
+            <div class="w-12 h-12 rounded-full overflow-hidden shrink-0">
+                <img alt="Avatar" class="w-full h-full object-cover" src="logo.jpg" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=Friend1'"/>
+            </div>
+            <div>
+                <h3 class="font-heading text-[18px] font-bold text-on-surface group-hover:text-blue-600 transition-colors">技术随想</h3>
+                <span class="text-on-surface-variant text-[12px] uppercase tracking-wider">前端 · React</span>
+                <p class="font-body text-[14px] text-on-surface-variant/80 mt-2 line-clamp-2">专注前端技术分享，React 生态最佳实践。</p>
+            </div>
+        </a>
+        <a class="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-all duration-300 group flex items-start gap-4" href="#">
+            <div class="w-12 h-12 rounded-full overflow-hidden shrink-0">
+                <img alt="Avatar" class="w-full h-full object-cover" src="logo.jpg" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=Friend2'"/>
+            </div>
+            <div>
+                <h3 class="font-heading text-[18px] font-bold text-on-surface group-hover:text-blue-600 transition-colors">后端架构笔记</h3>
+                <span class="text-on-surface-variant text-[12px] uppercase tracking-wider">后端 · Go</span>
+                <p class="font-body text-[14px] text-on-surface-variant/80 mt-2 line-clamp-2">深入 Go 语言、分布式系统和微服务架构。</p>
+            </div>
+        </a>
+        <a class="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-all duration-300 group flex items-start gap-4" href="#">
+            <div class="w-12 h-12 rounded-full overflow-hidden shrink-0">
+                <img alt="Avatar" class="w-full h-full object-cover" src="logo.jpg" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=Friend3'"/>
+            </div>
+            <div>
+                <h3 class="font-heading text-[18px] font-bold text-on-surface group-hover:text-blue-600 transition-colors">DevOps 之路</h3>
+                <span class="text-on-surface-variant text-[12px] uppercase tracking-wider">运维 · CI/CD</span>
+                <p class="font-body text-[14px] text-on-surface-variant/80 mt-2 line-clamp-2">自动化一切，探索 DevOps 最佳实践。</p>
+            </div>
+        </a>
+    </div>
+
+    <!-- Apply for a link -->
+    <div class="glass-card rounded-2xl p-8 relative overflow-hidden max-w-2xl">
+        <div class="relative z-10">
+            <h3 class="font-heading text-[24px] font-bold text-on-surface mb-3">申请友链</h3>
+            <p class="font-body text-[15px] text-on-surface-variant mb-6">欢迎高质量的个人博客交换链接。请填写以下信息，我会尽快回复。</p>
+            <form class="flex flex-col gap-4">
+                <input class="w-full px-4 py-3 rounded-xl bg-white/40 border border-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white/60 transition-all text-[14px]" placeholder="你的昵称" type="text"/>
+                <input class="w-full px-4 py-3 rounded-xl bg-white/40 border border-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white/60 transition-all text-[14px]" placeholder="https://yourblog.com" type="url"/>
+                <textarea class="w-full px-4 py-3 rounded-xl bg-white/40 border border-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:bg-white/60 transition-all text-[14px] resize-none" placeholder="简短描述你的博客" rows="3"></textarea>
+                <button class="mt-2 self-start px-8 py-3 bg-blue-500/90 hover:bg-blue-600 text-white rounded-xl font-bold text-[14px] tracking-wide transition-colors shadow-md" type="button">提交申请</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Scroll to top button -->
+<button class="bg-white/80 backdrop-blur-md w-10 h-10 rounded-lg flex items-center justify-center fixed bottom-8 right-8 z-[60] shadow-sm hover:bg-white transition-all duration-300 border border-white/40" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <span class="material-symbols-outlined text-on-surface-variant">keyboard_arrow_up</span>
+</button>
+
+<!-- Mobile bottom nav -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-nav flex justify-around py-2 overflow-x-auto overflow-y-hidden">
+    <div class="flex justify-around w-full min-w-max px-2 gap-4">
+        <a class="flex flex-col items-center gap-1 text-on-surface min-w-[3rem]" href="#" onclick="showSection('home')" data-mobile-nav="home">
+            <span class="material-symbols-outlined text-[20px]">home</span>
+            <span class="text-[11px]">首页</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-on-surface-variant opacity-60 min-w-[3rem]" href="#" onclick="showSection('archive')" data-mobile-nav="archive">
+            <span class="material-symbols-outlined text-[20px]">inventory_2</span>
+            <span class="text-[11px]">归档</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-on-surface-variant opacity-60 min-w-[3rem]" href="#" onclick="showSection('tags')" data-mobile-nav="tags">
+            <span class="material-symbols-outlined text-[20px]">sell</span>
+            <span class="text-[11px]">标签</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-on-surface-variant opacity-60 min-w-[3rem]" href="#" onclick="showSection('projects')" data-mobile-nav="projects">
+            <span class="material-symbols-outlined text-[20px]">code</span>
+            <span class="text-[11px]">项目</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-on-surface-variant opacity-60 min-w-[3rem]" href="#" onclick="showSection('about')" data-mobile-nav="about">
+            <span class="material-symbols-outlined text-[20px]">person</span>
+            <span class="text-[11px]">关于</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-on-surface-variant opacity-60 min-w-[3rem]" href="#" onclick="showSection('friends')" data-mobile-nav="friends">
+            <span class="material-symbols-outlined text-[20px]">group</span>
+            <span class="text-[11px]">友链</span>
+        </a>
+    </div>
+</div>
+
+<script>
+// Section navigation
+function showSection(section) {
+    document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+    const target = document.getElementById('section-' + section);
+    if (target) target.classList.remove('hidden');
+
+    // Update nav link active states
+    document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.dataset.section === section) {
+            link.classList.remove('text-on-surface-variant');
+            link.classList.add('text-on-surface');
+        } else {
+            link.classList.remove('text-on-surface');
+            link.classList.add('text-on-surface-variant');
+        }
+    });
+
+    // Update mobile nav
+    document.querySelectorAll('[data-mobile-nav]').forEach(a => {
+        if (a.dataset.mobileNav === section) {
+            a.classList.add('text-on-surface');
+            a.classList.remove('text-on-surface-variant', 'opacity-60');
+        } else {
+            a.classList.remove('text-on-surface');
+            a.classList.add('text-on-surface-variant', 'opacity-60');
+        }
+    });
+}
+
+// Search overlay
+function toggleSearch() {
+    // simplified search toggle
+    const overlay = document.getElementById('search-overlay');
+    if (overlay) {
+        overlay.classList.toggle('hidden');
+        if (!overlay.classList.contains('hidden')) {
+            overlay.querySelector('input').focus();
+        }
+    }
+}
+</script>
+
+</body>
+</html>
