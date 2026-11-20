@@ -1,0 +1,17 @@
+韩语口袋 · 한글노트
+
+分级词条整理自韩国国立国语院《韩国语基础词典》和 basickorean-vocab。
+本项目选取并整理了课程 1–6 级词条，配对中文释义和韩文例句。
+curriculum.js 中的词条数据沿用 CC BY-SA 2.0 KR 许可。
+
+韩国国立国语院《韩国语基础词典》
+https://krdict.korean.go.kr/
+
+basickorean-vocab 数据与分级来源
+https://github.com/basickorean/basickorean-vocab
+
+CC BY-SA 2.0 KR
+https://creativecommons.org/licenses/by-sa/2.0/kr/
+
+听力音频基于原创题目文本，使用 Supertone 的 Supertonic 3 合成。
+https://huggingface.co/Supertone/supertonic-3

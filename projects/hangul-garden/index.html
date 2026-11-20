@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fc">
+  <meta name="description" content="查找分级韩语词汇，用闪卡复习，并练习 3–4 级语法、听力、阅读和写作。">
+  <title>韩语口袋 · 한글노트</title>
+  <link rel="stylesheet" href="style.css?v=3">
+  <script src="curriculum.js" defer></script>
+  <script src="scenes.js" defer></script>
+  <script src="data.js?v=3" defer></script>
+  <script src="practice-data.js" defer></script>
+  <script src="practice.js" defer></script>
+  <script src="app.js?v=3" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" aria-label="主导航">
+      <a class="brand" href="#/wordbank">
+        <span class="brand-mark" lang="ko">한</span>
+        <span><strong>韩语口袋</strong><small lang="ko">한글노트</small></span>
+      </a>
+      <nav class="nav">
+        <div class="nav-label">学习空间</div>
+        <a href="#/wordbank" data-route="wordbank"><i class="glyph book" aria-hidden="true">▤</i><span>韩语词库</span></a>
+        <a href="#/grammar" data-practice-nav><i class="glyph" aria-hidden="true">◫</i><span>专项练习</span></a>
+        <a href="#/hangul" data-route="hangul"><i class="glyph" lang="ko" aria-hidden="true">가</i><span>韩文字母</span></a>
+        <a href="#/review" data-route="review"><i class="glyph rotate" aria-hidden="true">⟳</i><span>闪卡复习</span><span class="nav-count" id="nav-count" hidden></span></a>
+        <div class="nav-label personal">我的学习</div>
+        <a href="#/saved" data-route="saved"><i class="glyph" aria-hidden="true">☆</i><span>我的收藏</span></a>
+        <a href="#/progress" data-route="progress"><i class="glyph" aria-hidden="true">▥</i><span>学习进度</span></a>
+        <a href="../../#projects"><i class="glyph" aria-hidden="true">⌂</i><span>返回博客项目</span></a>
+      </nav>
+      <div class="sidebar-footer"><span class="avatar" lang="ko">나</span><span><strong>我的学习空间</strong><small>进度保存在此浏览器</small></span></div>
+    </aside>
+    <div class="body">
+      <header class="topbar">
+        <div class="breadcrumbs"><span>学习空间</span><span class="slash">/</span><strong id="crumb">韩语词库</strong></div>
+        <div class="top-actions">
+          <form id="search-form" class="search" role="search">
+            <span class="search-icon" aria-hidden="true"></span>
+            <input id="search" type="search" aria-label="搜索韩语词库" placeholder="搜索韩文、中文或罗马字" autocomplete="off">
+            <kbd title="按斜杠聚焦搜索框">/</kbd>
+          </form>
+          <button class="button outline add-button" data-action="add"><span aria-hidden="true">＋</span><span>添加单词</span></button>
+        </div>
+      </header>
+      <main id="main" tabindex="-1"></main>
+    </div>
+  </div>
+  <dialog id="dialog" aria-labelledby="dialog-title"></dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>
