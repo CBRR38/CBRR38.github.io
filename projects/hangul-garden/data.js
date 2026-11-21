@@ -88,7 +88,7 @@ const curriculumWords = curriculumEntries.map(([id, ko, grade, pos, pronunciatio
   const zh = glosses.slice(0, 2).join('；');
   return {
     id: `krd-${id}`, sourceId: id, ko, grade, zh, topic: 'course',
-    type: chinesePartsOfSpeech[pos] ?? pos, pronunciation, senses, sentence: senses[0][2]
+    type: chinesePartsOfSpeech[pos] || pos, pronunciation, senses, sentence: senses[0][2]
   };
 });
 
@@ -117,7 +117,8 @@ for (const [topic, keys] of Object.entries(sceneSelections)) {
   for (const item of keys.split(' ')) {
     const [ko, hint] = item.split('|');
     if (selectedHeadwords.has(ko)) continue;
-    const word = courseByHeadword.get(ko)?.find(entry => entry.senses.some(([gloss, detail]) =>
+    const candidates = courseByHeadword.get(ko) || [];
+    const word = candidates.find(entry => entry.senses.some(([gloss, detail]) =>
       !hint || gloss.includes(hint) || detail.includes(hint)));
     if (!word) continue;
     word.topic = topic;

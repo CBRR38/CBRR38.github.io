@@ -2,16 +2,18 @@
 
 const main = document.querySelector('#main');
 const dialog = document.querySelector('#dialog');
+const dialogShade = document.querySelector('#dialog-shade');
+const supportsNativeDialog = typeof dialog.showModal === 'function';
 const search = document.querySelector('#search');
 const toast = document.querySelector('#toast');
 const storageKey = 'hangul-garden.learning.v1';
 const pageSize = 8;
-const dayMs = 86_400_000;
+const dayMs = 86400000;
 const goal = 10;
 const routeLabels = {
-  wordbank: '韩语词库', hangul: '韩文字母', review: '闪卡复习', saved: '我的收藏', progress: '学习进度',
-  ...Object.fromEntries(practiceSections.map(({ route, title }) => [route, `${title}练习`]))
+  wordbank: '韩语词库', hangul: '韩文字母', review: '闪卡复习', saved: '我的收藏', progress: '学习进度'
 };
+for (const section of practiceSections) routeLabels[section.route] = `${section.title}练习`;
 const dateFormatter = new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit' });
 const shortDate = new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', month: 'numeric', day: 'numeric', weekday: 'short' });
 const defaultState = { favorites: [], custom: [], records: {}, activity: {} };
@@ -27,12 +29,13 @@ let session = null;
 let selection = null;
 let toastTimeout;
 let searchScrollPending = false;
+let dialogTrigger = null;
 
 function loadState() {
   try {
     const value = JSON.parse(localStorage.getItem(storageKey));
     return { ...defaultState, ...value };
-  } catch {
+  } catch (error) {
     return { ...defaultState };
   }
 }
@@ -41,24 +44,33 @@ function saveState() {
   try {
     localStorage.setItem(storageKey, JSON.stringify(state));
     return true;
-  } catch {
+  } catch (error) {
     announce('浏览器无法保存记录，本次打开时仍可继续学习。');
     return false;
   }
 }
 
 function safe(value) {
-  return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+  return String(value == null ? '' : value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 }
 
 const allWords = () => [...builtInWords, ...state.custom];
 const builtInWordById = new Map(builtInWords.map(word => [word.id, word]));
-const wordById = id => builtInWordById.get(id) ?? state.custom.find(word => word.id === id);
-const topicName = id => topics.find(item => item.id === id)?.name ?? '自定义';
+const wordById = id => builtInWordById.get(id) || state.custom.find(word => word.id === id);
+const topicName = id => {
+  const found = topics.find(item => item.id === id);
+  return found ? found.name : '自定义';
+};
 const dayKey = (time = Date.now()) => dateFormatter.format(time);
-const dailyIds = (time = Date.now()) => state.activity[dayKey(time)] ?? [];
-const isDue = (word, now = Date.now()) => state.records[word.id]?.due <= now;
-const isKnown = word => state.records[word.id]?.level >= 3;
+const dailyIds = (time = Date.now()) => state.activity[dayKey(time)] || [];
+const isDue = (word, now = Date.now()) => {
+  const entry = state.records[word.id];
+  return Boolean(entry && entry.due <= now);
+};
+const isKnown = word => {
+  const entry = state.records[word.id];
+  return Boolean(entry && entry.level >= 3);
+};
 const activeWords = () => allWords().filter(word => state.records[word.id]);
 const gradeGroups = [
   { id: 'beginner', label: '初级', exam: 'TOPIK I', grades: [1, 2] },
@@ -70,24 +82,28 @@ gradeRanges.set('topik2', [3, 4, 5, 6]);
 const matchesGrade = (word, grade) => {
   if (grade === 'all') return true;
   if (grade === 'extra') return !word.grade;
-  return gradeRanges.get(grade)?.includes(word.grade) ?? (String(word.grade) === grade);
+  const range = gradeRanges.get(grade);
+  return range ? range.includes(word.grade) : String(word.grade) === grade;
 };
 const gradeOptions = [
   ['all', '所有等级'],
-  ['topik2', 'TOPIK II（3–6 级）'],
-  ...gradeGroups.flatMap(({ id, label, grades }) => [
-    [id, `${label}（${grades[0]}–${grades[1]} 级）`],
-    ...grades.map(grade => [String(grade), `课程 ${grade} 级`])
-  ]),
-  ['extra', '补充词汇']
+  ['topik2', 'TOPIK II（3–6 级）']
 ];
-const gradeLabel = grade => gradeOptions.find(([value]) => value === grade)?.[1] ?? '所有等级';
+for (const { id, label, grades } of gradeGroups) {
+  gradeOptions.push([id, `${label}（${grades[0]}–${grades[1]} 级）`]);
+  gradeOptions.push(...grades.map(grade => [String(grade), `课程 ${grade} 级`]));
+}
+gradeOptions.push(['extra', '补充词汇']);
+const gradeLabel = grade => {
+  const found = gradeOptions.find(([value]) => value === grade);
+  return found ? found[1] : '所有等级';
+};
 const option = (id, label, current) => `<option value="${id}" ${current === id ? 'selected' : ''}>${label}</option>`;
 const number = value => value.toLocaleString('zh-CN');
 const soundIcon = '<span class="speaker" aria-hidden="true"></span>';
 
 function announce(message) {
-  if (dialog.open) {
+  if (dialog.hasAttribute('open')) {
     const statusLine = dialog.querySelector('[data-dialog-status]');
     if (statusLine) {
       statusLine.textContent = message;
@@ -143,7 +159,7 @@ function updateNav() {
 function render() {
   updateNav();
   const views = { wordbank: renderBank, saved: renderBank, hangul: renderHangul, review: renderReview, progress: renderProgress };
-  main.innerHTML = (views[route] ?? renderPractice)();
+  main.innerHTML = (views[route] || renderPractice)();
 }
 
 function renderBank() {
@@ -151,7 +167,7 @@ function renderBank() {
   const counts = allWords();
   const gradeThree = builtInWords.filter(word => word.grade === 3);
   const dailyWords = gradeThree.length ? gradeThree : builtInWords;
-  const dailyIndex = Math.floor((Date.now() + 8 * 3_600_000) / dayMs) % dailyWords.length;
+  const dailyIndex = Math.floor((Date.now() + 8 * 3600000) / dayMs) % dailyWords.length;
   const daily = dailyWords[dailyIndex];
   const done = dailyIds().length;
   const spotlight = `<aside aria-label="今日学习">
@@ -243,7 +259,8 @@ function renderList() {
     if (status === 'new' && state.records[word.id]) return false;
     if (status === 'known' && !isKnown(word)) return false;
     if (!terms.length) return true;
-    const searchable = [word.ko, word.roman, word.zh, ...(word.senses?.map(([gloss]) => gloss) ?? [])].join(' ').normalize('NFC').toLowerCase();
+    const extraGlosses = word.senses ? word.senses.map(([gloss]) => gloss) : [];
+    const searchable = [word.ko, word.roman, word.zh, ...extraGlosses].join(' ').normalize('NFC').toLowerCase();
     return terms.every(term => searchable.includes(term));
   });
   const perPage = sceneIds.has(topic) ? 12 : pageSize;
@@ -317,7 +334,7 @@ function renderReview() {
     <div class="flashcard">
       <h2 class="large-ko" lang="ko">${safe(word.ko)}</h2>
       ${mode === 'flash' ? soundButton(word) : ''}
-      ${revealed ? `<div class="answer"><h3>${safe(word.zh)}</h3>${word.sentence ? `<p lang="ko">${safe(word.sentence)}</p><p class="muted">${safe(word.translation ?? word.senses?.[0]?.[1])}</p>` : ''}</div>` : ''}
+      ${revealed ? `<div class="answer"><h3>${safe(word.zh)}</h3>${word.sentence ? `<p lang="ko">${safe(word.sentence)}</p><p class="muted">${safe(word.translation || (word.senses && word.senses[0][1]))}</p>` : ''}</div>` : ''}
     </div>
     ${mode === 'quiz' ? `<div class="quiz-options">${quiz.map((option, idx) => {
       const css = picked < 0 ? '' : option === word.zh ? 'right' : idx === picked ? 'wrong' : '';
@@ -360,7 +377,29 @@ function renderProgress() {
 
 function showDialog(markup) {
   dialog.innerHTML = markup + '<p class="form-note" data-dialog-status role="status"></p>';
-  if (!dialog.open) dialog.showModal();
+  if (dialog.hasAttribute('open')) return;
+  if (supportsNativeDialog) {
+    dialog.showModal();
+    return;
+  }
+  dialogTrigger = document.activeElement;
+  dialogShade.hidden = false;
+  dialog.classList.add('legacy-dialog');
+  dialog.setAttribute('open', '');
+  dialog.querySelector('button').focus();
+}
+
+function closeDialog() {
+  if (supportsNativeDialog) {
+    dialog.close();
+    return;
+  }
+  if (!dialog.hasAttribute('open')) return;
+  dialog.removeAttribute('open');
+  dialogShade.hidden = true;
+  if (dialogTrigger && document.contains(dialogTrigger)) dialogTrigger.focus({ preventScroll: true });
+  dialogTrigger = null;
+  dialog.dispatchEvent(new Event('close'));
 }
 
 function dialogHeader(title) {
@@ -403,11 +442,13 @@ function showAdd(importing = false) {
       <button class="button ${importing ? 'soft' : 'outline'}" data-action="import" aria-pressed="${importing}">批量导入</button></div>
     <form class="form-fields" id="word-form" data-importing="${importing}">${fields}
       <p class="form-error" role="alert" hidden></p><button class="button" type="submit">${importing ? '导入词表' : '添加到词库'}</button></form>`);
-  dialog.querySelector('textarea, input')?.focus();
+  const field = dialog.querySelector('textarea, input');
+  if (field) field.focus();
 }
 
 function addWords(form) {
-  const input = Object.fromEntries([...new FormData(form)].map(([key, value]) => [key, value.trim().normalize('NFC')]));
+  const input = {};
+  new FormData(form).forEach((value, key) => { input[key] = value.trim().normalize('NFC'); });
   const importing = form.dataset.importing === 'true';
   const lines = importing ? input.rows.split(/\r?\n/).filter(line => line.trim()) : [];
   const showError = message => {
@@ -442,7 +483,7 @@ function addWords(form) {
     return;
   }
   state.custom = [...added, ...state.custom];
-  dialog.close();
+  closeDialog();
   const stored = saveState();
   setFilters('custom');
   navigate('wordbank', true);
@@ -459,7 +500,7 @@ function toggleFavorite(word, button) {
   button.title = label;
   button.innerHTML = `<span aria-hidden="true">${saved ? '☆' : '★'}</span>${button.classList.contains('button') ? label : ''}`;
   if (saveState()) announce(saved ? '已取消收藏。' : '已添加到我的收藏。');
-  if (route === 'saved' || dialog.open) render();
+  if (route === 'saved' || dialog.hasAttribute('open')) render();
 }
 
 function shuffle(items) {
@@ -484,19 +525,23 @@ function start(mode, favoritesOnly = false, singleWord = null) {
   const words = allWords().filter(word => matchesGrade(word, reviewGrade) && (!favoritesOnly || state.favorites.includes(word.id)));
   const due = words.filter(word => isDue(word, now)).sort((a, b) => state.records[a.id].due - state.records[b.id].due);
   const fresh = words.filter(word => !state.records[word.id]);
-  const upcoming = words.filter(word => state.records[word.id]?.due > now).sort((a, b) => state.records[a.id].due - state.records[b.id].due);
+  const upcoming = words.filter(word => state.records[word.id] && state.records[word.id].due > now)
+    .sort((a, b) => state.records[a.id].due - state.records[b.id].due);
   const pool = [...due, ...fresh];
   const queue = singleWord ? [singleWord.id] : (pool.length ? pool : upcoming).slice(0, 10).map(word => word.id);
   if (!queue.length) return;
-  const scope = singleWord?.grade ? gradeLabel(String(singleWord.grade)) : singleWord ? '单词练习' : gradeLabel(reviewGrade);
+  const scope = singleWord
+    ? (singleWord.grade ? gradeLabel(String(singleWord.grade)) : '单词练习')
+    : gradeLabel(reviewGrade);
   session = { queue, mode, scope, index: 0, revealed: false, quiz: mode === 'quiz' ? quizOptions(wordById(queue[0])) : [], picked: -1, correct: 0 };
   navigate('review');
-  main.querySelector('.flashcard h2')?.scrollIntoView({ block: 'nearest' });
+  const title = main.querySelector('.flashcard h2');
+  if (title) title.scrollIntoView({ block: 'nearest' });
 }
 
 function record(id, level) {
   const now = Date.now();
-  const intervals = [600_000, dayMs, 3 * dayMs, 7 * dayMs];
+  const intervals = [600000, dayMs, 3 * dayMs, 7 * dayMs];
   state.records[id] = { level, due: now + intervals[level] };
   state.activity[dayKey(now)] = [...new Set([...dailyIds(now), id])];
   saveState();
@@ -530,7 +575,8 @@ function setFilters(nextTopic = 'all') {
 }
 
 function scrollToResults() {
-  document.querySelector('#word-results')?.scrollIntoView({ block: 'start', behavior: 'instant' });
+  const results = document.querySelector('#word-results');
+  if (results) results.scrollIntoView({ block: 'start' });
 }
 
 function navigate(nextRoute, keepFilters = false) {
@@ -546,7 +592,7 @@ function navigate(nextRoute, keepFilters = false) {
 
 function fromHash() {
   const name = location.hash.slice(2);
-  const next = Object.hasOwn(routeLabels, name) ? name : 'wordbank';
+  const next = Object.prototype.hasOwnProperty.call(routeLabels, name) ? name : 'wordbank';
   if (route !== next) navigate(next);
   if (searchScrollPending) {
     searchScrollPending = false;
@@ -559,7 +605,8 @@ function changeTopic(id) {
   gradeFilter = 'all';
   page = 1;
   render();
-  main.querySelector('[data-action="topic"][data-id="' + id + '"]')?.focus({ preventScroll: true });
+  const target = main.querySelector('[data-action="topic"][data-id="' + id + '"]');
+  if (target) target.focus({ preventScroll: true });
   scrollToResults();
 }
 
@@ -572,7 +619,8 @@ const actions = {
     status = 'all';
     page = 1;
     render();
-    main.querySelector('#grade-filter')?.focus({ preventScroll: true });
+    const filter = main.querySelector('#grade-filter');
+    if (filter) filter.focus({ preventScroll: true });
     scrollToResults();
   },
   'practice-level': ({ id }) => {
@@ -583,18 +631,18 @@ const actions = {
   },
   detail: ({ word }) => showWord(word),
   favorite: ({ word, button }) => toggleFavorite(word, button),
-  sound: ({ word, button }) => say(word?.ko ?? button.dataset.value),
-  'sound-sentence': ({ word }) => say(word?.sentence),
+  sound: ({ word, button }) => say(word ? word.ko : button.dataset.value),
+  'sound-sentence': ({ word }) => { if (word) say(word.sentence); },
   add: () => showAdd(),
   import: () => showAdd(true),
-  close: () => dialog.close(),
+  close: closeDialog,
   'clear-filters': () => { setFilters(); render(); focusList(); },
   previous: () => { page -= 1; render(); focusList(true); },
   'next-page': () => { page += 1; render(); focusList(true); },
   'start-review': () => start('flash'),
   'start-quiz': () => start('quiz'),
   'review-saved': () => start('flash', true),
-  'review-word': ({ word }) => { dialog.close(); if (word) start('flash', false, word); },
+  'review-word': ({ word }) => { closeDialog(); if (word) start('flash', false, word); },
   'end-review': () => { session = null; render(); focusReview(); },
   flip: () => { session.revealed = true; render(); focusReview('.flashcard .answer h3'); },
   rate: ({ id }) => {
@@ -625,8 +673,8 @@ const actions = {
     for (const day of Object.keys(state.activity)) {
       state.activity[day] = state.activity[day].filter(id => id !== word.id);
     }
-    if (session?.queue.includes(word.id)) session = null;
-    dialog.close();
+    if (session && session.queue.includes(word.id)) session = null;
+    closeDialog();
     if (saveState()) announce('已删除自定义单词。');
     render();
   }
@@ -634,7 +682,7 @@ const actions = {
 
 function focusList(firstWord = false) {
   const target = main.querySelector(firstWord ? '.word-row .word-link' : '#topic-filter');
-  target?.focus({ preventScroll: true });
+  if (target) target.focus({ preventScroll: true });
   scrollToResults();
 }
 
@@ -642,7 +690,9 @@ document.addEventListener('click', event => {
   const button = event.target.closest('button[data-action]');
   if (!button) return;
   const { action, id } = button.dataset;
-  actions[action]?.({ button, id, word: id ? wordById(id) : null });
+  if (Object.prototype.hasOwnProperty.call(actions, action)) {
+    actions[action]({ button, id, word: id ? wordById(id) : null });
+  }
 });
 
 main.addEventListener('change', event => {
@@ -654,7 +704,8 @@ main.addEventListener('change', event => {
   else return;
   page = 1;
   render();
-  document.getElementById(id)?.focus({ preventScroll: true });
+  const control = document.getElementById(id);
+  if (control) control.focus({ preventScroll: true });
 });
 main.addEventListener('submit', submitPractice);
 main.addEventListener('input', updatePracticeDraft);
@@ -666,11 +717,13 @@ dialog.addEventListener('submit', event => {
   event.preventDefault();
   addWords(event.target);
 });
+dialogShade.addEventListener('click', closeDialog);
 dialog.addEventListener('close', () => {
   const lastOpened = selection;
   selection = null;
   if (lastOpened && document.activeElement === document.body) {
-    [...main.querySelectorAll('[data-action="detail"]')].find(button => button.dataset.id === lastOpened)?.focus({ preventScroll: true });
+    const trigger = Array.from(main.querySelectorAll('[data-action="detail"]')).find(button => button.dataset.id === lastOpened);
+    if (trigger) trigger.focus({ preventScroll: true });
   }
 });
 
@@ -698,7 +751,19 @@ document.querySelector('#search-form').addEventListener('submit', event => {
 });
 
 document.addEventListener('keydown', event => {
-  if (event.key === '/' && !dialog.open && !event.target.matches('input, textarea, select, [contenteditable]')) {
+  if (!supportsNativeDialog && dialog.hasAttribute('open')) {
+    if (event.key === 'Escape') closeDialog();
+    else if (event.key === 'Tab') {
+      const controls = dialog.querySelectorAll('button:not([disabled]), input, textarea');
+      const edge = event.shiftKey ? controls[0] : controls[controls.length - 1];
+      if (document.activeElement === edge) {
+        event.preventDefault();
+        (event.shiftKey ? controls[controls.length - 1] : controls[0]).focus();
+      }
+    }
+    return;
+  }
+  if (event.key === '/' && !dialog.hasAttribute('open') && !event.target.matches('input, textarea, select, [contenteditable]')) {
     event.preventDefault();
     search.focus();
   }

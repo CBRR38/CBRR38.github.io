@@ -264,8 +264,13 @@ main:focus { outline: none; }
 .writing-reference h3 { font-size: 1rem; margin-bottom: 5px; }
 .writing-reference h3:not(:first-child) { margin-top: 12px; }
 .writing-reference ul { margin: 4px 0 8px; padding-inline-start: 22px; }
-dialog { width: min(92vw, 545px); max-height: 90dvh; padding: 25px; border-radius: 19px; border: 1px solid var(--line); color: var(--ink); box-shadow: 0 18px 85px #111b4652; }
+.startup-panel { max-width: 600px; }
+.startup-panel p { margin: 10px 0; color: var(--muted); }
+dialog { width: 92vw; max-width: 545px; max-height: 90vh; max-height: 90dvh; overflow: auto; padding: 25px; border-radius: 19px; border: 1px solid var(--line); color: var(--ink); box-shadow: 0 18px 85px #111b4652; }
+dialog:not([open]) { display: none; }
 dialog::backdrop { background: #11183c73; }
+.dialog-shade { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 30; background: rgba(17, 24, 60, .45); }
+.legacy-dialog[open] { display: block; position: fixed; top: 50%; left: 50%; margin: 0; transform: translate(-50%, -50%); z-index: 31; background: var(--paper); }
 .dialog-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
 .dialog-top h2 { font-size: 1.45rem; line-height: 1.32; }
 .dialog-top .icon-button { flex: 0 0 auto; font-size: 1.5rem; }

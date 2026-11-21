@@ -15,7 +15,7 @@ const chosenTasks = new Map();
 function loadPractice() {
   try {
     return { ...basePractice, ...JSON.parse(localStorage.getItem(practiceKey)) };
-  } catch {
+  } catch (error) {
     return { ...basePractice };
   }
 }
@@ -24,7 +24,7 @@ function storePractice() {
   try {
     localStorage.setItem(practiceKey, JSON.stringify(practiceState));
     return true;
-  } catch {
+  } catch (error) {
     return false;
   }
 }
@@ -39,7 +39,7 @@ function currentTasks(section = currentSection()) {
 
 function currentTask(section = currentSection()) {
   const visible = currentTasks(section);
-  return visible.find(task => task.id === chosenTasks.get(section.route)) ?? visible[0];
+  return visible.find(task => task.id === chosenTasks.get(section.route)) || visible[0];
 }
 
 function isFinished(task) {
@@ -117,7 +117,7 @@ function renderChoice(task, section) {
       ${task.options.map((text, index) => {
         const result = !saved ? '' : index === task.answer ? 'correct' : index === saved.choice ? 'incorrect' : '';
         return `<label class="practice-option ${result}">
-          <input type="radio" name="choice" value="${index}" ${index === 0 ? 'required' : ''} ${saved ? 'disabled' : ''} ${saved?.choice === index ? 'checked' : ''}>
+          <input type="radio" name="choice" value="${index}" ${index === 0 ? 'required' : ''} ${saved ? 'disabled' : ''} ${saved && saved.choice === index ? 'checked' : ''}>
           <span lang="ko">${safe(text)}</span>${result ? `<small>${result === 'correct' ? '正确答案' : '你的选项'}</small>` : ''}
         </label>`;
       }).join('')}</fieldset>
@@ -133,9 +133,9 @@ function charCount(value) {
 }
 
 function renderWriting(task) {
-  const saved = practiceState.drafts[task.id] ?? {};
+  const saved = practiceState.drafts[task.id] || {};
   const done = practiceState.writingDone[task.id];
-  const fields = task.blanks ?? ['用韩语作答'];
+  const fields = task.blanks || ['用韩语作答'];
   return `<div class="practice-material practice-passage" lang="ko">${safe(task.passage)}</div>
     ${task.rows ? `<table class="practice-data-table"><thead><tr>${task.columns.map(column => `<th scope="col">${safe(column)}</th>`).join('')}</tr></thead>
       <tbody>${task.rows.map(([name, ...cells]) => `<tr><th scope="row">${safe(name)}</th>${cells.map(cell => `<td>${safe(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table>` : ''}
@@ -147,7 +147,7 @@ function renderWriting(task) {
       </label>`).join('')}
       <div class="writing-meta">
         <small id="writing-status" role="status">${Object.values(saved).some(Boolean) ? '草稿保存在此浏览器' : ''}</small>
-        ${task.range ? `<small><span id="writing-count">${charCount(saved[0] ?? '')}</span> 字 · 建议 ${task.range.join('–')} 字（含空格）</small>` : ''}
+        ${task.range ? `<small><span id="writing-count">${charCount(saved[0] || '')}</span> 字 · 建议 ${task.range.join('–')} 字（含空格）</small>` : ''}
       </div>
       ${!done ? '<button class="button" type="submit">完成并对照参考</button>' : ''}
     </form>
@@ -160,7 +160,9 @@ function renderWriting(task) {
 }
 
 function practiceFocus(selector) {
-  main.querySelector(selector)?.focus({ preventScroll: true });
+  const element = main.querySelector(selector);
+  if (element) element.focus({ preventScroll: true });
+  return element;
 }
 
 function openPracticeTask(id, moveFocus = true) {
@@ -169,8 +171,8 @@ function openPracticeTask(id, moveFocus = true) {
   chosenTasks.set(section.route, id);
   render();
   if (moveFocus) {
-    practiceFocus('#practice-title');
-    main.querySelector('#practice-title')?.scrollIntoView({ block: 'nearest' });
+    const title = practiceFocus('#practice-title');
+    if (title) title.scrollIntoView({ block: 'nearest' });
   }
 }
 
@@ -201,14 +203,16 @@ function submitPractice(event) {
       announce('请先填完答案，再对照参考写法。');
       return;
     }
-    practiceState.drafts[task.id] = Object.fromEntries(values.map((value, index) => [index, value]));
+    const draft = {};
+    values.forEach((value, index) => { draft[index] = value; });
+    practiceState.drafts[task.id] = draft;
     practiceState.writingDone[task.id] = true;
   }
   const stored = storePractice();
   render();
   if (!stored) announce('浏览器暂时无法保存此记录。');
-  practiceFocus('.practice-feedback');
-  main.querySelector('.practice-feedback')?.scrollIntoView({ block: 'nearest' });
+  const feedback = practiceFocus('.practice-feedback');
+  if (feedback) feedback.scrollIntoView({ block: 'nearest' });
 }
 
 function updatePracticeDraft(event) {
@@ -216,7 +220,7 @@ function updatePracticeDraft(event) {
   if (!field.closest('#practice-writing')) return;
   const task = currentTask();
   const index = field.name.slice('draft-'.length);
-  const draft = practiceState.drafts[task.id] ?? {};
+  const draft = practiceState.drafts[task.id] || {};
   draft[index] = field.value;
   practiceState.drafts[task.id] = draft;
   const countEl = main.querySelector('#writing-count');
