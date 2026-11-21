@@ -6,19 +6,19 @@
   <meta name="theme-color" content="#f7f8fc">
   <meta name="description" content="查找分级韩语词汇，用闪卡复习，并练习 3–4 级语法、听力、阅读和写作。">
   <title>韩语口袋 · 한글노트</title>
-  <link rel="stylesheet" href="runtime-v4/style.css">
+  <link rel="stylesheet" href="runtime-v5/style.css">
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       var notice = document.getElementById('app-startup-status');
       if (notice) notice.textContent = '学习内容加载失败。请刷新重试，或在系统浏览器中打开。';
     });
   </script>
-  <script src="curriculum.js" defer></script>
+  <script src="runtime-v5/curriculum-preview.js" defer></script>
   <script src="scenes.js" defer></script>
-  <script src="runtime-v4/data.js" defer></script>
+  <script src="runtime-v5/data.js" defer></script>
   <script src="practice-data.js" defer></script>
-  <script src="runtime-v4/practice.js" defer></script>
-  <script src="runtime-v4/app.js" defer></script>
+  <script src="runtime-v5/practice.js" defer></script>
+  <script src="runtime-v5/app.js" defer></script>
 </head>
 <body>
   <div class="shell">
@@ -36,7 +36,7 @@
         <div class="nav-label personal">我的学习</div>
         <a href="#/saved" data-route="saved"><i class="glyph" aria-hidden="true">☆</i><span>我的收藏</span></a>
         <a href="#/progress" data-route="progress"><i class="glyph" aria-hidden="true">▥</i><span>学习进度</span></a>
-        <a href="../../#projects"><i class="glyph" aria-hidden="true">⌂</i><span>返回博客项目</span></a>
+        <a href="../../#projects"><i class="glyph" aria-hidden="true">⌂</i><span>返回博客</span></a>
       </nav>
       <div class="sidebar-footer"><span class="avatar" lang="ko">나</span><span><strong>我的学习空间</strong><small>进度保存在此浏览器</small></span></div>
     </aside>
@@ -46,12 +46,16 @@
         <div class="top-actions">
           <form id="search-form" class="search" role="search">
             <span class="search-icon" aria-hidden="true"></span>
-            <input id="search" type="search" aria-label="搜索韩语词库" placeholder="搜索韩文、中文或罗马字" autocomplete="off">
+            <input id="search" type="search" aria-label="按韩文、中文或罗马字查词" placeholder="搜索韩语词汇" autocomplete="off">
             <kbd title="按斜杠聚焦搜索框">/</kbd>
           </form>
           <button class="button outline add-button" data-action="add"><span aria-hidden="true">＋</span><span>添加单词</span></button>
         </div>
       </header>
+      <div id="catalog-state" class="catalog-state" hidden>
+        <p id="catalog-message" role="status">正在加载完整词库，可先使用已加载词条。</p>
+        <button class="button outline" id="catalog-retry" hidden>重试</button>
+      </div>
       <main id="main" tabindex="-1">
         <section class="panel panel-pad startup-panel">
           <h1>韩语口袋</h1>
